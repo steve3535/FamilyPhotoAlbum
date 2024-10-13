@@ -1,46 +1,24 @@
 # Contributing to the Family Photo Album
 
-Welcome, family member! Here's how you can contribute to our shared album:
+Welcome, family member! We're excited to have you contribute to our shared album. This project is designed to teach collaboration using Git and GitHub through the familiar concept of a family photo album.
 
-## Adding a New "Photo"
+## Code of Conduct
 
-1. Create a new branch from `main` with a descriptive name (e.g., `add-summer-picnic-2023`).
-2. In the appropriate folder, create a new Markdown file named after your photo (e.g., `summer-picnic-2023.md`).
-3. Use this template for your file:
+- Be respectful and kind in all your interactions.
+- Provide constructive feedback when reviewing others' contributions.
+- Remember that everyone is here to learn and grow together.
 
-```markdown
-# [Title of Photo]
+## How to Contribute
 
-![Description](https://placeholder.com/your-photo-name)
+1. Start with Lesson 1 in the Issues tab. This will guide you through adding your first "photo" to the album.
+2. Follow the subsequent lessons to learn more advanced collaboration techniques.
+3. Feel free to ask questions in the issue comments if you need help.
 
-**Date:** [Date of Photo]
-**Location:** [Where it was taken]
+## Need Help?
 
-**Description:** 
-[Write a few sentences about this photo]
+If you're stuck or have any questions, don't hesitate to:
+- Ask in the comments of the relevant issue
+- Open a new issue for general questions
+- Reach out to the project maintainers
 
-**People:** 
-- [Person 1]
-- [Person 2]
-- ...
-
-**Tags:** #[tag1], #[tag2], ...
-```
-
-4. Commit your changes with a clear message.
-5. Push your branch and create a Pull Request.
-
-## Updating an Existing "Photo"
-
-1. Create a new branch from `main`.
-2. Make your changes to the existing Markdown file.
-3. Commit, push, and create a Pull Request with your updates.
-
-## Resolving Conflicts
-
-If your Pull Request has conflicts:
-1. Pull the latest changes from the `main` branch into your branch.
-2. Resolve any conflicts in the files.
-3. Commit the resolved changes and update your Pull Request.
-
-Remember, this is a collaborative project. Be kind, be constructive, and happy memory sharing!
+Remember, this is a collaborative project. Be patient, be kind, and happy memory sharing!
