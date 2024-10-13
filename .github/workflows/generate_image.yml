@@ -75,5 +75,4 @@ jobs:
         fi
 
     - name: Output Generated Image URL
-      if: success()
       run: echo "Generated Image URL: ${{ env.IMAGE_URL }}"
