@@ -1,0 +1,79 @@
+name: Generate Image from Markdown
+
+on:
+  push:
+    paths:
+      - 'album/*.md'  # Trigger the workflow when a markdown file is committed
+
+jobs:
+  generate_image:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3  # Check out the repo so we can access the markdown files
+
+    - name: Read Markdown File and Extract Prompt
+      id: extract_prompt
+      run: |
+        # Specify the markdown file to read
+        MARKDOWN_FILE=$(git diff --name-only HEAD^ HEAD | grep .md)
+
+        # Extract the prompt (assuming the description is in a specific format)
+        PROMPT=$(grep -Po '(?<=\*\*Description\*\*:).*$' "$MARKDOWN_FILE" | sed 's/^ *//;s/ *$//')
+        echo "PROMPT=$PROMPT" >> $GITHUB_ENV
+
+    - name: Generate Image with AI API
+      run: |
+        # Set API URL and API Key as secrets in GitHub
+        API_URL="https://modelslab.com/api/v6/realtime/text2img"
+        API_KEY="${{ secrets.IMAGE_API_KEY }}"
+
+        # Prepare the JSON payload
+        PAYLOAD=$(jq -n \
+          --arg key "$API_KEY" \
+          --arg prompt "$PROMPT" \
+          --arg negative_prompt "bad quality" \
+          --argjson width 512 \
+          --argjson height 512 \
+          --argjson safety_checker false \
+          --argjson seed null \
+          --argjson samples 1 \
+          --argjson base64 false \
+          --argjson webhook null \
+          --argjson track_id null \
+          '{
+            key: $key,
+            prompt: $prompt,
+            negative_prompt: $negative_prompt,
+            width: $width,
+            height: $height,
+            safety_checker: $safety_checker,
+            seed: $seed,
+            samples: $samples,
+            base64: $base64,
+            webhook: $webhook,
+            track_id: $track_id
+          }'
+        )
+
+        # Make the API request to generate the image
+        RESPONSE=$(curl -X POST "$API_URL" \
+          -H "Content-Type: application/json" \
+          -d "$PAYLOAD" \
+          | jq -r '.image_url')
+
+        # Parse the response to check the status and extract the image URL
+        STATUS=$(echo "$RESPONSE" | jq -r '.status')
+        if [ "$STATUS" == "success" ]; then
+          IMAGE_URL=$(echo "$RESPONSE" | jq -r '.output')
+          echo "Image generated at: $IMAGE_URL"
+          echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_ENV
+        else
+          echo "Image generation failed. Response: $RESPONSE"
+          exit 1
+        fi
+
+    - name: Output Generated Image URL
+      if: success()
+      run: echo "Generated Image URL: ${{ env.IMAGE_URL }}"
