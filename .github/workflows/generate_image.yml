@@ -23,39 +23,37 @@ jobs:
       
     - name: Read Markdown File and Extract Prompt
       run: |
-        # Check if HEAD^ exists and handle the latest commit diff
-        if git rev-parse HEAD^ >/dev/null 2>&1; then
-          MARKDOWN_FILE=$(git diff --name-only HEAD^ HEAD | grep .md || true)
-        else
-          # Fallback to just checking the latest commit
-          MARKDOWN_FILE=$(git diff --name-only HEAD | grep .md || true)
-        fi
+        # Find all markdown files in the album directory
+        MARKDOWN_FILES=$(find album -name '*.md')
 
-        # Debugging: Log the markdown file found (if any)
-        echo "MARKDOWN_FILE: $MARKDOWN_FILE"
+        # Debugging: Log the markdown files found (if any)
+        echo "MARKDOWN_FILES: $MARKDOWN_FILES"
         
-        # Check if MARKDOWN_FILE is empty
-        if [ -z "$MARKDOWN_FILE" ]; then
+        # Check if any markdown files were found
+        if [ -z "$MARKDOWN_FILES" ]; then
           echo "No markdown file found. Exiting."
           exit 0
         fi
 
-        # Extract the prompt (assuming the description is in a specific format)
-        echo "Attempting to extract prompt from file: $MARKDOWN_FILE"
-        PROMPT=$(grep -Po '(?<=\*\*Description\*\*:).*$' "$MARKDOWN_FILE" | sed 's/^ *//;s/ *$//')
+        # Loop over each markdown file
+        for MARKDOWN_FILE in $MARKDOWN_FILES; do
+          echo "Processing file: $MARKDOWN_FILE"
+          
+          # Extract the prompt (assuming the description is in a specific format)
+          PROMPT=$(grep -Po '(?<=\*\*Description\*\*:).*$' "$MARKDOWN_FILE" | sed 's/^ *//;s/ *$//')
 
-        # Check if the prompt was successfully extracted
-        if [ -z "$PROMPT" ]; then
-          echo "No prompt found in the markdown file. Exiting."
-          exit 0
-        fi
+          # Check if the prompt was successfully extracted
+          if [ -z "$PROMPT" ]; then
+            echo "No prompt found in $MARKDOWN_FILE. Skipping."
+            continue
+          fi
 
-        # Debugging: Log the extracted prompt
-        echo "Extracted Prompt: $PROMPT"
+          # Debugging: Log the extracted prompt
+          echo "Extracted Prompt from $MARKDOWN_FILE: $PROMPT"
 
-        # Save the prompt to the GitHub environment
-        echo "PROMPT=$PROMPT" >> $GITHUB_ENV
-
+          # Save the prompt to the GitHub environment (last extracted one)
+          echo "PROMPT=$PROMPT" >> $GITHUB_ENV
+        done
     - name: Generate Image with AI API
       run: |
         # Set API URL and API Key as secrets in GitHub
