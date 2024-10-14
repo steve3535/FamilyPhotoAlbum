@@ -3,7 +3,7 @@ name: Generate Image from Markdown
 on:
   push:
     paths:
-      - 'album/*.md'  # Trigger the workflow when a markdown file is committed
+      - 'album/**/*.md'  # Trigger the workflow when a markdown file is committed
 
 jobs:
   generate_image:
@@ -12,6 +12,15 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3  # Check out the repo so we can access the markdown files
+    - name: Verify current directory and list files
+      run: |
+        # Print the current directory
+        echo "Current directory: $(pwd)"
+
+        # List all files and directories at the current location
+        echo "Listing contents:"
+        ls -la
+      
     - name: Read Markdown File and Extract Prompt
       run: |
         # Check if HEAD^ exists and handle the latest commit diff
