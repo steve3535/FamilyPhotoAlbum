@@ -1,4 +1,4 @@
-# Image Generation Request
+# Photo Generation Request
 
 **Title**: A sunset over a mountain
 
