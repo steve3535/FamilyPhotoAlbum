@@ -23,8 +23,7 @@ jobs:
       
     - name: Read Markdown File and Extract Prompt
       run: |
-        MARKDOWN_FILE=$(git diff --name-only HEAD~1 HEAD)
-
+        MARKDOWN_FILE=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$' || true)
         # Debugging: Log the markdown file found (if any)
         echo "MARKDOWN_FILE: $MARKDOWN_FILE"
         
