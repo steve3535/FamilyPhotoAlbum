@@ -2,4 +2,4 @@
 
 **Title**: A sunset over a mountain
 
-**Description**: The image should depict beautiful sunset, the sky blending shades of orange, and purple, over a serene mountain range.
+**Description**: The image should depict beautiful sunset, the sky blending shade of orange, and purple, over a serene mountain range.
