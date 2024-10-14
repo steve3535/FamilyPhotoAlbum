@@ -14,10 +14,14 @@ jobs:
       uses: actions/checkout@v3  # Check out the repo so we can access the markdown files
 
     - name: Read Markdown File and Extract Prompt
-      id: extract_prompt
       run: |
-        # Specify the markdown file to read
-        MARKDOWN_FILE=$(git diff --name-only HEAD^ HEAD | grep .md)
+        # Check if HEAD^ exists
+        if git rev-parse HEAD^ >/dev/null 2>&1; then
+          MARKDOWN_FILE=$(git diff --name-only HEAD^ HEAD | grep .md)
+        else
+          # Fallback to just checking the latest commit
+          MARKDOWN_FILE=$(git diff --name-only HEAD | grep .md)
+        fi
 
         # Extract the prompt (assuming the description is in a specific format)
         PROMPT=$(grep -Po '(?<=\*\*Description\*\*:).*$' "$MARKDOWN_FILE" | sed 's/^ *//;s/ *$//')
