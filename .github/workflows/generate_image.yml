@@ -12,23 +12,39 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3  # Check out the repo so we can access the markdown files
-
     - name: Read Markdown File and Extract Prompt
       run: |
-        # sayhello
-        echo "Hello World"
-        # Check if HEAD^ exists
+        # Check if HEAD^ exists and handle the latest commit diff
         if git rev-parse HEAD^ >/dev/null 2>&1; then
-          MARKDOWN_FILE=$(git diff --name-only HEAD^ HEAD | grep .md)
+          MARKDOWN_FILE=$(git diff --name-only HEAD^ HEAD | grep .md || true)
         else
           # Fallback to just checking the latest commit
-          MARKDOWN_FILE=$(git diff --name-only HEAD | grep .md)
+          MARKDOWN_FILE=$(git diff --name-only HEAD | grep .md || true)
+        fi
+
+        # Debugging: Log the markdown file found (if any)
+        echo "MARKDOWN_FILE: $MARKDOWN_FILE"
+        
+        # Check if MARKDOWN_FILE is empty
+        if [ -z "$MARKDOWN_FILE" ]; then
+          echo "No markdown file found. Exiting."
+          exit 0
         fi
 
         # Extract the prompt (assuming the description is in a specific format)
+        echo "Attempting to extract prompt from file: $MARKDOWN_FILE"
         PROMPT=$(grep -Po '(?<=\*\*Description\*\*:).*$' "$MARKDOWN_FILE" | sed 's/^ *//;s/ *$//')
-        echo $MARKDOWN_FILE
-        echo $PROMPT
+
+        # Check if the prompt was successfully extracted
+        if [ -z "$PROMPT" ]; then
+          echo "No prompt found in the markdown file. Exiting."
+          exit 0
+        fi
+
+        # Debugging: Log the extracted prompt
+        echo "Extracted Prompt: $PROMPT"
+
+        # Save the prompt to the GitHub environment
         echo "PROMPT=$PROMPT" >> $GITHUB_ENV
 
     - name: Generate Image with AI API
