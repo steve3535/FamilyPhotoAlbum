@@ -23,37 +23,32 @@ jobs:
       
     - name: Read Markdown File and Extract Prompt
       run: |
-        # Find all markdown files in the album directory
-        MARKDOWN_FILES=$(find album -name '*.md')
+        MARKDOWN_FILE=$(git diff --name-only HEAD~1 HEAD)
 
-        # Debugging: Log the markdown files found (if any)
-        echo "MARKDOWN_FILES: $MARKDOWN_FILES"
+        # Debugging: Log the markdown file found (if any)
+        echo "MARKDOWN_FILE: $MARKDOWN_FILE"
         
-        # Check if any markdown files were found
-        if [ -z "$MARKDOWN_FILES" ]; then
+        # Check if MARKDOWN_FILE is empty
+        if [ -z "$MARKDOWN_FILE" ]; then
           echo "No markdown file found. Exiting."
           exit 0
         fi
 
-        # Loop over each markdown file
-        for MARKDOWN_FILE in $MARKDOWN_FILES; do
-          echo "Processing file: $MARKDOWN_FILE"
-          
-          # Extract the prompt (assuming the description is in a specific format)
-          PROMPT=$(grep -Po '(?<=\*\*Description\*\*:).*$' "$MARKDOWN_FILE" | sed 's/^ *//;s/ *$//')
+        # Extract the prompt (assuming the description is in a specific format)
+        echo "Attempting to extract prompt from file: $MARKDOWN_FILE"
+        PROMPT=$(grep -Po '(?<=\*\*Description\*\*:).*$' "$MARKDOWN_FILE" | sed 's/^ *//;s/ *$//')
 
-          # Check if the prompt was successfully extracted
-          if [ -z "$PROMPT" ]; then
-            echo "No prompt found in $MARKDOWN_FILE. Skipping."
-            continue
-          fi
+        # Check if the prompt was successfully extracted
+        if [ -z "$PROMPT" ]; then
+          echo "No prompt found in the markdown file. Exiting."
+          exit 0
+        fi
 
-          # Debugging: Log the extracted prompt
-          echo "Extracted Prompt from $MARKDOWN_FILE: $PROMPT"
+        # Debugging: Log the extracted prompt
+        echo "Extracted Prompt: $PROMPT"
 
-          # Save the prompt to the GitHub environment (last extracted one)
-          echo "PROMPT=$PROMPT" >> $GITHUB_ENV
-        done
+        # Save the prompt to the GitHub environment
+        echo "PROMPT=$PROMPT" >> $GITHUB_ENV      
     - name: Generate Image with AI API
       run: |
         # Set API URL and API Key as secrets in GitHub
