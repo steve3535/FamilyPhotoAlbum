@@ -25,6 +25,8 @@ jobs:
 
         # Extract the prompt (assuming the description is in a specific format)
         PROMPT=$(grep -Po '(?<=\*\*Description\*\*:).*$' "$MARKDOWN_FILE" | sed 's/^ *//;s/ *$//')
+        echo $MARKDOWN_FILE
+        echo $PROMPT
         echo "PROMPT=$PROMPT" >> $GITHUB_ENV
 
     - name: Generate Image with AI API
